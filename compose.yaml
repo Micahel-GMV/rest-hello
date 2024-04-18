@@ -1,0 +1,10 @@
+version: '3.8'  # Use any compatible version
+
+services:
+# No services are defined here to avoid side effects
+
+networks:
+# No networks are defined since there are no services
+
+volumes:
+# No volumes are defined for the same reason
