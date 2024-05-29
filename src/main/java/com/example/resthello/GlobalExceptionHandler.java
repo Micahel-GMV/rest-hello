@@ -1,6 +1,7 @@
 package com.example.resthello;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -12,18 +13,23 @@ import static com.example.resthello.RequestLogger.LogLevel.*;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    @Autowired
+    private RequestLogger requestLogger;
+
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<?> handleMethodNotSupportedException(HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
-        RequestLogger.logRequest(this.getClass(), request, WARN, "Method '" +request.getMethod() + "' is not allowed!");
-        return ResponseEntity
+        ResponseEntity response = ResponseEntity
                 .status(HttpStatus.METHOD_NOT_ALLOWED)
                 .body("{\"error\": \"Method " + ex.getMethod() + " not supported\"}");
+        requestLogger.logRequest(this.getClass(), request, response, WARN, "Method '" +request.getMethod() + "' is not allowed!");
+        return response;
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<?> handleMissingParams(MissingServletRequestParameterException ex, HttpServletRequest request) {
         String name = ex.getParameterName();
-        RequestLogger.logRequest(this.getClass(), request, WARN, "Parameter '" + name + "' is missing!");
-        return ResponseEntity.badRequest().body("{\"error\": \"Parameter '" + name + "' is missing\"}");
+        ResponseEntity response = ResponseEntity.badRequest().body("{\"error\": \"Parameter '" + name + "' is missing\"}");
+        requestLogger.logRequest(this.getClass(), request, response, WARN, "Parameter '" + name + "' is missing!");
+        return response;
     }
 }
